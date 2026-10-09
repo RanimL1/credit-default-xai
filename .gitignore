@@ -1,0 +1,18 @@
+# Environnement et caches
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Secrets : ne jamais envoyer sur GitHub
+.streamlit/secrets.toml
+.env
+
+# Fichiers générés
+credit_default_clean.csv
+resultats_*.csv
+
+# Système et éditeur
+.DS_Store
+Thumbs.db
+.vscode/
