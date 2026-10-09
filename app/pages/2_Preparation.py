@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
-
+import pandas as pd
 import streamlit as st
 from sklearn.model_selection import train_test_split
 
@@ -21,7 +21,7 @@ features = st.multiselect("Variables explicatives", candidats, default=candidats
 if taiwan:
     defaut_cat = [c for c in ["SEX", "EDUCATION", "MARRIAGE"] if c in features]
 else:
-    defaut_cat = [c for c in features if df[c].dtype == object or str(df[c].dtype) == "category"]
+    defaut_cat = [c for c in features if not pd.api.types.is_numeric_dtype(df[c])]
 cat = st.multiselect("Variables catégorielles (encodage one-hot)", features, default=defaut_cat)
 num = [c for c in features if c not in cat]
 
