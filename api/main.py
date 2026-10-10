@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-
+from fastapi.responses import RedirectResponse
 from api import explain
 from api.schemas import (
     Prediction, ReponseComplete, ReponseLime, ReponseShap, Requete,
@@ -13,7 +13,9 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
-
+@app.get("/", include_in_schema=False)
+def racine():
+       return RedirectResponse(url="/docs")
 
 def _verifier_modele(nom):
     if nom not in explain.modeles_disponibles():
