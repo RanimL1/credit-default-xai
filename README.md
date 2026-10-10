@@ -37,17 +37,17 @@ Modèles optimisés, évalués sur le jeu de test (seuil 0,5) :
 Avec XGBoost au seuil 0,5, le rappel est d'environ 0,61 et la précision d'environ 0,47. Baisser le seuil détecte davantage de défauts au prix de plus de fausses alertes. Les modèles les plus performants sont les méthodes d'ensemble, mais l'écart avec la régression logistique (interprétable) reste modeste, ce qui nourrit la discussion performance contre interprétabilité.
 
 ## Structure du dépôt
-
+ 
 ```
-api/              API FastAPI (main.py, modeles.py, schemas.py)
-app/              Application Streamlit (Home.py et pages/)
-core/             Logique partagée (données, préparation, modèles, métriques)
-models/           Modèles entraînés (joblib) utilisés par l'API
-notebooks/        Scripts d'exploration et d'entraînement
-requirements.txt  Dépendances de l'application Streamlit
-requirements-api.txt  Dépendances de l'API
-Dockerfile        Image de l'API (déploiement Hugging Face Spaces)
-test_api.py       Test rapide de l'API
+api/                   API FastAPI (main.py, explain.py, schemas.py, requirements.txt)
+app/                   Application Streamlit (Home.py et pages/)
+core/                  Logique partagée (données, préparation, modèles, métriques, XAI, client de l'API)
+models/                Modèles entraînés et jeu de test (joblib) utilisés par l'API
+notebooks/             Notebook(s) d'analyse (explicabilité)
+.streamlit/            Modèle de configuration (secrets.toml.example)
+requirements.txt       Dépendances de l'application Streamlit
+Dockerfile             Image de l'API (déploiement Hugging Face Spaces)
+test_api.py            Test rapide de l'API
 ```
 
 ## Installation et lancement
@@ -84,19 +84,23 @@ La documentation interactive est sur http://localhost:8000/docs. Pour tester : `
 | `GET /health` | Vérifie que le service tourne |
 | `GET /models` | Liste les modèles et les variables attendues |
 | `POST /predict` | Probabilité de défaut et décision au seuil choisi |
+| `POST /explain/shap` | Contributions SHAP d'un client et phrase de synthèse |
+| `POST /explain/lime` | Contributions LIME d'un client |
+| `POST /explain` | Tout en un : prédiction, SHAP, LIME, variables communes et phrase de synthèse |
 
 Les modèles de `models/` ont été sauvegardés avec scikit-learn 1.6.1 et XGBoost 3.2.0 : `requirements-api.txt` fixe ces versions. Charger les modèles avec d'autres versions peut échouer ou donner des résultats différents.
 
 ## Limites
-
+ 
 - Le jeu de données est ancien (Taïwan, 2005) et propre à un contexte bancaire : les résultats ne se transposent pas tels quels à un autre établissement.
 - Le plafond de performance sur ce jeu est autour de 0,78 d'AUC dans la littérature : les gains supplémentaires viennent surtout de l'ingénierie de variables et du choix du seuil.
-- Les variables sensibles (sexe, âge, situation familiale) font partie des données ; leur effet sur l'équité du modèle reste à analyser (module XAI).
-
+- L'explication d'un client par l'API concerne le jeu Taiwan et ses modèles pré-entraînés ; avec un autre jeu importé, seules les explications globales sont disponibles.
+- SHAP n'est pas proposé pour le kNN (trop lent). Les valeurs SHAP se répartissent entre variables corrélées, et LIME dépend de son échantillonnage : les explications sont à lire comme des éclairages, pas comme des causes.
+- Les variables sensibles (sexe, âge, situation familiale) font partie des données : leur usage dans un vrai système de crédit soulève des questions d'équité et de réglementation.
 ## Référence
-
+ 
 Yeh, I-C., & Lien, C-H. (2009). *The comparisons of data mining techniques for the predictive accuracy of probability of default of credit card clients.* Expert Systems with Applications, 36(2).
-
+ 
 ## Auteur
-
+ 
 Ranim Latrous, étudiante en 3e année, spécialité intelligence artificielle, ENSI.
