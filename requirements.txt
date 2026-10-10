@@ -6,3 +6,5 @@ xgboost
 plotly
 requests
 ucimlrepo
+shap
+matplotlib

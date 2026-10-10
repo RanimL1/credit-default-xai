@@ -1,3 +1,4 @@
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -49,6 +50,7 @@ class Requete(BaseModel):
     client: Client
     modele: str = Field("XGBoost", description="XGBoost, Random Forest, Régression logistique, Arbre de décision, k plus proches voisins")
     seuil: float = Field(0.5, ge=0, le=1, description="Seuil de décision sur la probabilité de défaut")
+    n_variables: int = Field(8, ge=1, le=20, description="Nombre de variables à renvoyer dans les explications")
 
 
 class Prediction(BaseModel):
@@ -56,3 +58,32 @@ class Prediction(BaseModel):
     probabilite_defaut: float
     seuil: float
     decision: str = Field(..., description="'defaut_probable' si probabilité >= seuil, sinon 'pas_de_defaut'")
+
+
+class Contribution(BaseModel):
+    variable: str
+    valeur: Optional[float] = Field(None, description="Valeur du client pour cette variable (si variable d'origine)")
+    contribution: float = Field(..., description="> 0 : augmente le risque de défaut ; < 0 : le diminue")
+
+
+class ReponseShap(BaseModel):
+    modele: str
+    probabilite_defaut: float
+    valeur_de_base: float
+    unite: str = Field(..., description="'log-odds' (XGBoost, régression logistique) ou 'probabilité' (arbres, forêt)")
+    contributions: List[Contribution]
+    phrase: str
+
+
+class ReponseLime(BaseModel):
+    modele: str
+    probabilite_defaut: float
+    contributions: List[Contribution]
+
+
+class ReponseComplete(BaseModel):
+    prediction: Prediction
+    shap: Optional[ReponseShap] = None
+    lime: ReponseLime
+    variables_communes_top5: List[str]
+    phrase: str
