@@ -5,7 +5,8 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 import streamlit as st
 
-from core.api_client import api_disponible, url_api
+from core.api_client import url_api
+from core.api_embarquee import demarrer_api_si_besoin
 
 st.set_page_config(page_title="Classification explicable", page_icon="📊", layout="wide")
 
@@ -27,10 +28,14 @@ avec **SHAP** et **LIME**, globalement et client par client.
 
 with st.sidebar:
     st.subheader("API d'interprétation")
-    if api_disponible():
+    with st.spinner("Démarrage de l'API (quelques secondes)..."):
+        api_prete, erreur_api = demarrer_api_si_besoin()
+    if api_prete:
         st.success("API connectée")
     else:
         st.warning("API injoignable : les explications locales (page 5) seront indisponibles.")
+        if erreur_api:
+            st.caption(erreur_api)
     st.caption(url_api())
 
 if "df" in st.session_state:

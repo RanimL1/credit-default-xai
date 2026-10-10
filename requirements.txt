@@ -1,10 +1,15 @@
 streamlit>=1.50
 pandas
 numpy
-scikit-learn
-xgboost
+scikit-learn==1.6.1
+xgboost==3.2.0
 plotly
 requests
 ucimlrepo
 shap
 matplotlib
+fastapi
+uvicorn
+pydantic>=2
+joblib
+lime

@@ -98,6 +98,7 @@ def graphique_waterfall(rep):
     """Cascade des contributions SHAP (les variables non affichées sont regroupées)."""
     s = rep["shap"]
     base, unite, p = s["valeur_de_base"], s["unite"], rep["prediction"]["probabilite_defaut"]
+    p = min(max(p, 1e-6), 1 - 1e-6)          # évite la division par zéro si la probabilité vaut 0 ou 1
     final = float(np.log(p / (1 - p))) if unite == "log-odds" else p
     contribs = s["contributions"]
     autres = final - base - sum(c["contribution"] for c in contribs)
