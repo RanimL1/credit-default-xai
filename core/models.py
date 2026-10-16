@@ -10,7 +10,7 @@ NOMS_MODELES = [
 ]
 
 
-def creer_modele(nom, params, ratio=1.0, poids=True, seed=42):
+def creer_modele(nom, params, ratio=1.0, poids=True, seed=42, n_jobs=2):
     cw = "balanced" if poids else None
     if nom == "Régression logistique":
         return LogisticRegression(max_iter=2000, class_weight=cw, random_state=seed, **params)
@@ -19,10 +19,10 @@ def creer_modele(nom, params, ratio=1.0, poids=True, seed=42):
     if nom == "k plus proches voisins":
         return KNeighborsClassifier(**params)
     if nom == "Random Forest":
-        return RandomForestClassifier(class_weight=cw, n_jobs=-1, random_state=seed, **params)
+        return RandomForestClassifier(class_weight=cw, n_jobs=n_jobs, random_state=seed, **params)
     if nom == "XGBoost":
         return XGBClassifier(scale_pos_weight=ratio if poids else 1.0, eval_metric="logloss",
-                             n_jobs=-1, random_state=seed, **params)
+                             n_jobs=n_jobs, random_state=seed, **params)
     raise ValueError(nom)
 
 
